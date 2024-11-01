@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 HUGGING_FACE_API_URL = 'https://api-inference.huggingface.co/models/facebook/bart-large-mnli'
-HUGGING_FACE_API_TOKEN = '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'
+HUGGING_FACE_API_TOKEN = ''
 
 @app.route('/')
 def index():

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF Text Display</title>
+</head>
+<body>
+    <h1>Upload a PDF to Display Text</h1>
+    <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" id="file-input" name="file" accept="application/pdf" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <div id="text-display"></div>
+    <div id="validation-result"></div>
+
+    <script>
+        // Clear display content when a new file is selected
+        document.getElementById('file-input').onchange = () => {
+            document.getElementById('text-display').textContent = '';
+            document.getElementById('validation-result').textContent = '';
+        };
+
+        document.getElementById('upload-form').onsubmit = async (e) => {
+            e.preventDefault();
+
+            // Clear display content when form is submitted
+            document.getElementById('text-display').textContent = 'Loading...';
+            document.getElementById('validation-result').textContent = '';
+
+            const formData = new FormData(e.target);
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+
+            // Display extracted text and validation results
+            document.getElementById('text-display').textContent = result.extracted_text || 'No text found';
+            document.getElementById('validation-result').textContent = JSON.stringify(result.validation_result, null, 2);
+        };
+    </script>
+</body>
+</html>

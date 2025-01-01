@@ -40,6 +40,8 @@ def upload_file():
 
     # Decrypt the uploaded file in memory
     input_pdf = file.stream  # File as a stream (in-memory)
+    file_content = file.read() 
+    input_pdf = io.BytesIO(file_content)
     decrypted_pdf_stream = io.BytesIO()  # In-memory stream to hold decrypted file
 
     # Decrypt the PDF
@@ -48,7 +50,24 @@ def upload_file():
 
     # Return the decrypted PDF directly in the response
     decrypted_pdf_stream.seek(0)  # Ensure we start from the beginning of the stream
-    return send_file(decrypted_pdf_stream, as_attachment=True, download_name='decrypted.pdf', mimetype='application/pdf')
+    # return send_file(decrypted_pdf_stream, as_attachment=True, download_name='decrypted.pdf', mimetype='application/pdf')
+    # Return the decrypted PDF directly in the response
+    # Return the decrypted PDF directly in the response
+    response = send_file(
+        decrypted_pdf_stream,
+        as_attachment=True,
+        download_name='decrypted.pdf',
+        mimetype='application/pdf'
+    )
+
+    # Set the content-length header explicitly
+    # decrypted_pdf_stream.seek(0)  # Reset to the beginning before determining length
+    # response.headers['Content-Length'] = str(decrypted_pdf_stream.tell())
+
+    # # Optional: Set the content-disposition header for proper download behavior
+    # response.headers['Content-Disposition'] = 'attachment; filename=decrypted.pdf'
+
+    return response
 
 
 if __name__ == '__main__':

@@ -19,6 +19,8 @@
         document.getElementById('file-input').onchange = () => {
             document.getElementById('text-display').textContent = '';
             document.getElementById('validation-result').textContent = '';
+            document.getElementById('error-message').textContent = '';
+            document.getElementById('file-link').innerHTML = '';
         };
 
         document.getElementById('upload-form').onsubmit = async (e) => {
@@ -33,11 +35,43 @@
                 method: 'POST',
                 body: formData
             });
-            const result = await response.json();
+            // const result = await response.json();
+
+            if (!response.ok) {
+                const result = await response.json();
+                document.getElementById('error-message').textContent = result.error || 'An unknown error occurred.';
+                document.getElementById('text-display').textContent = '';
+                return;
+            }
+
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+
+            // Trigger the download by creating a temporary link and clicking it
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'decrypted.pdf'; // You can customize the filename here
+            document.body.appendChild(link);
+            link.click();
+
+            // Clean up the object URL after download
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+                document.body.removeChild(link);
+            }, 100);
+
+            // const contentDisposition = response.headers.get('Content-Disposition');
+            // const filenameMatch = contentDisposition && contentDisposition.match(/filename="([^"]+)"/);
+            // const filename = filenameMatch ? filenameMatch[1] : 'decrypted.pdf';
+
+            // // Display download link for the decrypted file
+            // const blob = await response.blob();
+            // const url = URL.createObjectURL(blob);
+            // document.getElementById('file-link').innerHTML = `Download Decrypted PDF: <a href="${url}" download="${filename}">Click here</a>`;
 
             // Display extracted text and validation results
-            document.getElementById('text-display').textContent = result.extracted_text || 'No text found';
-            document.getElementById('validation-result').textContent = JSON.stringify(result.validation_result, null, 2);
+            // document.getElementById('text-display').textContent = result.extracted_text || 'No text found';
+            // document.getElementById('validation-result').textContent = JSON.stringify(result.validation_result, null, 2);
         };
     </script>
 </body>
